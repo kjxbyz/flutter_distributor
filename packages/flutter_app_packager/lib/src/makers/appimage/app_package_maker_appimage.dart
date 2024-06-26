@@ -250,7 +250,7 @@ class AppPackageMakerAppImage extends AppPackageMaker {
           makeConfig.outputFile.path.replaceAll('.appimage', '.AppImage'),
         ],
         environment: {
-          'ARCH': 'x86_64',
+          'ARCH': _getArchitecture(),
         },
       ).then((value) {
         if (value.exitCode != 0) {
@@ -264,5 +264,17 @@ class AppPackageMakerAppImage extends AppPackageMaker {
       if (e is MakeError) rethrow;
       throw MakeError(e.toString());
     }
+  }
+}
+
+String _getArchitecture() {
+  final result = Process.runSync('uname', ['-m']);
+  final arch = '${result.stdout}'.trim();
+  if (arch == 'arm64') {
+    return 'aarch64';
+  } else if (arch == 'arm') {
+    return 'armhf';
+  } else {
+    return arch;
   }
 }
